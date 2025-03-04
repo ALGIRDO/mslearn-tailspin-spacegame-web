@@ -45,12 +45,12 @@ steps:
     arguments: '--no-restore --configuration $(buildConfiguration)'
     projects: '**/*.csproj'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Install .NET tools from local manifest'
-  inputs:
-    command: custom
-    custom: tool
-    arguments: 'restore'
+#- task: DotNetCoreCLI@2
+#  displayName: 'Install .NET tools from local manifest'
+#  inputs:
+#    command: custom
+#    custom: tool
+#    arguments: 'restore'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run unit tests - $(buildConfiguration)'
@@ -60,12 +60,19 @@ steps:
     publishTestResults: true
     projects: '**/*.Tests.csproj'
 
-- task: DotNetCoreCLI@2
-  displayName: 'Create code coverage report'
+#- task: DotNetCoreCLI@2
+#  displayName: 'Create code coverage report'
+#  inputs:
+#    command: custom
+#    custom: tool
+#    arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
+
+- task: reportgenerator@5
+  displayName: ReportGenerator
   inputs:
-    command: custom
-    custom: tool
-    arguments: 'run reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines'
+    reports: $(Build.SourcesDirectory)/**/coverage.cobertura.xml
+    targetdir: $(Build.SourcesDirectory)/CodeCoverage
+    reporttypes: Html;HtmlInline_AzurePipelines
 
 - task: PublishCodeCoverageResults@1
   displayName: 'Publish code coverage report'
